@@ -1,0 +1,74 @@
+<template>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <router-link to="/" class="navbar-brand">Stock Trader</router-link>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <router-link to="/portfolio" active-class="active" tag="li">
+                        <a>Porfolio</a>
+                    </router-link>
+                    <router-link to="/stocks" active-class="active" tag="li">
+                        <a>Stocks</a>
+                    </router-link>
+                </ul>
+
+                <strong class="navbar-text navbar-right">Funds: {{ funds | currency }}</strong>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a @click="endDay" href="#">End Day</a></li>
+                    <li
+                        class="dropdown"
+                        :class="{'open': isDropdownOpen}"
+                        @click="isDropdownOpen = !isDropdownOpen">
+                        <a href="#" class="dropdown-toggle">Save & Load<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a @click="saveData" href="#">Save Data</a></li>
+                            <li><a @click="loadData" href="#">Load Data</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</template>
+
+<script>
+    import { mapActions } from 'vuex';
+
+    export default {
+        data() {
+            return {
+                isDropdownOpen: false
+            };
+        },
+        computed: {
+            funds() {
+                return this.$store.getters.funds;
+            }
+        },
+        methods: {
+            ...mapActions({
+                randomizeStocks: 'randomizeStocks',
+                fetchData: 'loadData' // rename
+            }),
+            endDay() {
+                this.randomizeStocks();
+            },
+            saveData() {
+                const data = {
+                    funds: this.$store.getters.funds,
+                    stockPortfolio: this.$store.getters.stockPortfolio,
+                    stocks: this.$store.getters.stocks
+                };
+                
+                window.localStorage.setItem('stockTraderData', JSON.stringify(data));
+            },
+            loadData() {
+                this.fetchData();
+            }
+        }
+    };
+</script>
